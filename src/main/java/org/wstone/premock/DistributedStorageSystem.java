@@ -17,12 +17,16 @@ public class DistributedStorageSystem {
 
     // this is the approach involving the use of a priority queue and a server class, etc.
     PriorityQueue<Server> queue;
+    // for part three, change servers to...
+    // HashMap<Character, Integer> servers
+    // and add parameter to Server class constructor for capacity
+    // in the addFile method, do a capacity check and if none, return null.
     public DistributedStorageSystem(char[] servers) throws SocketException {
         // note how the instructions ask you for a specific task, nothing about
         // simulating sockets or anything beyond writing the one method
         queue = new PriorityQueue<>();
         for (int i = 0; i < servers.length; i++) {
-            queue.add(new Server(servers[i], ThreadLocalRandom.current().nextInt(0,10000)));
+            queue.add(new Server(servers[i]));
         }
     }
     char storeFile(String path, int size){
@@ -53,15 +57,13 @@ public class DistributedStorageSystem {
     class Server implements Comparable<Server>{
         char order;
         int usedStorage = 0;
-        int port;
         HashMap<String, Integer> files;
-        DatagramSocket socket = null;
+        //
 
-        public Server(char order, int port) throws SocketException {
+        public Server(char order) throws SocketException {
             this.order = order;
-            this.port = port;
-            socket = new DatagramSocket(port);
             files = new HashMap<>();
+            //
         }
         void addFile(String file, int size){
             files.put(file, size);
