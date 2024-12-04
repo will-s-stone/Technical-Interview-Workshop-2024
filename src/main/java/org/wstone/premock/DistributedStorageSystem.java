@@ -5,9 +5,12 @@ import java.net.DatagramSocket;
 import java.net.Socket;
 import java.net.SocketException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.PriorityQueue;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class DistributedStorageSystem {
 
@@ -28,23 +31,50 @@ public class DistributedStorageSystem {
         queue.add(server);
         return server.order;
     }
+
+    void deleteFile(String file) {
+        Server temp = null;
+        for(Server server : queue){
+            // One mistake here would be to leave this as is
+            // but due to the ordering of a pq being done when
+            // items are added, we need to copy and add the server back
+            // otherwise our ordering will be off.
+            if (server.removeFile(file)){
+                temp = server;
+            }
+        }
+        if (temp != null){
+            queue.remove(temp);
+            queue.add(temp);
+        }
+    }
+
+
     class Server implements Comparable<Server>{
         char order;
         int usedStorage = 0;
         int port;
-        ArrayList<File> files;
+        HashMap<String, Integer> files;
         DatagramSocket socket = null;
 
         public Server(char order, int port) throws SocketException {
             this.order = order;
             this.port = port;
             socket = new DatagramSocket(port);
-            files = new ArrayList<>();
+            files = new HashMap<>();
         }
-        void addFile(String path, int size){
-            File file = new File(path);
-            files.add(file);
+        void addFile(String file, int size){
+            files.put(file, size);
             usedStorage += size;
+        }
+
+        boolean removeFile(String file){
+            if(files.containsKey(file)){
+                usedStorage =- files.get(file);
+                files.remove(file);
+                return true;
+            }
+            return false;
         }
 
         @Override
@@ -64,5 +94,10 @@ public class DistributedStorageSystem {
         System.out.println(system.storeFile("two.txt", 50));
         System.out.println(system.storeFile("three.txt", 50));
         System.out.println(system.storeFile("four.txt", 50));
+        system.deleteFile("two.txt");
+        System.out.println(system.storeFile("five.txt", 60));
+        system.deleteFile("three.txt");
+        System.out.println(system.storeFile("six.txt", 70));
+
     }
 }
