@@ -1,27 +1,17 @@
 package org.wstone.premock;
 
-import java.io.File;
-import java.net.DatagramSocket;
-import java.net.Socket;
 import java.net.SocketException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.PriorityQueue;
-import java.util.Random;
-import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
-public class DistributedStorageSystem {
-
-
+public class DistributedStorageSystemBad {
     // this is the approach involving the use of a priority queue and a server class, etc.
     PriorityQueue<Server> queue;
     // for part three, change servers to...
     // HashMap<Character, Integer> servers
     // and add parameter to Server class constructor for capacity
     // in the addFile method, do a capacity check and if none, return null.
-    public DistributedStorageSystem(char[] servers) throws SocketException {
+    public DistributedStorageSystemBad(char[] servers) throws SocketException {
         // note how the instructions ask you for a specific task, nothing about
         // simulating sockets or anything beyond writing the one method
         queue = new PriorityQueue<>();
@@ -91,7 +81,7 @@ public class DistributedStorageSystem {
 
     public static void main(String[] args) throws SocketException {
         char[] servers = {'a', 'b', 'c'};
-        DistributedStorageSystem system = new DistributedStorageSystem(servers);
+        DistributedStorageSystemBad system = new DistributedStorageSystemBad(servers);
         System.out.println(system.storeFile("one.txt", 100));
         System.out.println(system.storeFile("two.txt", 50));
         System.out.println(system.storeFile("three.txt", 50));
